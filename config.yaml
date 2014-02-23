@@ -206,3 +206,15 @@ options:
         type: int
         default: 8080
         description: "Port the application will be listenning."
+    listen_ip:
+        type: string
+        default: "0.0.0.0"
+        description: "IP adresses that Gunicorn will listen on. By default we listen on all of them."
+    listen_ip:
+        type: string
+        default: "0.0.0.0"
+        description: "IP adresses that Gunicorn will listen on. By default we listen on all of them."
+    listen_ip:
+        type: string
+        default: "0.0.0.0"
+        description: "IP adresses that Gunicorn will listen on. By default we listen on all of them."

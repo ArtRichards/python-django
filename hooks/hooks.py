@@ -485,6 +485,25 @@ def install():
         else:
             juju_log(MSG_ERROR, '''Failed to process repos_username and repos_password:\n
                                    cannot identify domain in URL {0}'''.format(repos_url))
+### do ssh-add here, place the ssh key within the id_rsa file
+    template_vars = { 'ssh-comment': ssh_comment,
+            'ssh-key': ssh_key }
+    from os.path import expanduser
+    process_template('ssh-key.tmpl', template_vars, expanduser('~/.ssh/id_rsa')) ###
+    run('ssh-add')
+
+### set env vars here (env_vars is a dictionary)
+    from os.path import expanduser
+    template_vars = { 'var1': env_var1,
+        'val1': env_val1,
+        'var2': env_var2,
+        'val2': env_val2,
+        'var3': env_var3,
+        'val3': env_val3 }
+    process_template('pam_environment.tmpl', template_vars, expanduser('~/.pam_environment')  ###
+    for env_var, env_val in env_vars.iteritems():
+        run('export %s = %s', env_var, env_val)
+
         
     if vcs == 'hg' or vcs == 'mercurial':
         run('hg clone %s %s' % (repos_url, vcs_clone_dir))
@@ -545,6 +564,13 @@ def config_changed(config_data):
     os.environ['DJANGO_SETTINGS_MODULE'] = django_settings_modules
     django_admin_cmd = find_django_admin_cmd()
 
+### set env vars here (env_vars is a dictionary)
+    from os.path import expanduser
+    template_vars = env_vars
+    process_template('pam_environment.tmpl', template_vars, expanduser('~/.pam_environment')
+    for env_var, env_val in env_vars.iteritems():
+        run('export %s = %s', env_var, env_val)
+
     site_secret_key = config_data['site_secret_key']
     if not site_secret_key:
         site_secret_key = ''.join([choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50)])
@@ -566,6 +592,14 @@ def upgrade():
             time.sleep(10)
         else:
             break
+
+### set env vars here (env_vars is a dictionary)
+    from os.path import expanduser
+    template_vars = env_vars
+    process_template('pam_environment.tmpl', template_vars, expanduser('~/.pam_environment')
+    for env_var, env_val in env_vars.iteritems():
+        run('export %s = %s', env_var, env_val)
+
 
     if vcs == 'hg' or vcs == 'mercurial':
         run('hg pull %s %s' % (repos_url, vcs_clone_dir))
@@ -744,6 +778,14 @@ config_data = config_get()
 juju_log(MSG_DEBUG, "got config: %s" % str(config_data))
 
 django_version = config_data['django_version']
+env_var1 = config_data['env_var1']
+env_val1 = config_data['env_val1']
+env_var2 = config_data['env_var2']
+env_val2 = config_data['env_val2']
+env_var3 = config_data['env_var3']
+env_val3 = config_data['env_val3']
+ssh_comment = config_data['ssh_comment']
+ssh_key = config_data['ssh_key']
 vcs = config_data['vcs']
 repos_url = config_data['repos_url']
 repos_username = config_data['repos_username']

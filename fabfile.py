@@ -139,6 +139,26 @@ def ssh_add_key(pub_key_file, username=None):
         files.append('/home/%s/.ssh/authorized_keys' % username, ssh_key)
         run('chown -R %s:%s /home/%s/.ssh' % (username, username, username))
 
+#ENV_VARS .pam_environment
+@task
+def set_env_vars(vars_file, username=None):
+    """
+    Set (secret?) ENV_VARS using a .pam_environment file
+    """
+    with open(os.path.normpath(vars_file), 'rt') as f:
+        env_vars = f.readlines()
+        
+        for env_var in env_vars:
+            if username is None:
+                run('touch .pam_environment')
+                files.append('.pam_environment', env_var)
+                run('export %s', env_var)
+            else:
+                run('touch /home/%s/.pam_environment' % username)
+                files.append('/home/%s/.pam_environment' % username, env_var)
+                run('chown -R %s:%s /home/%s/.pam_environment' % (username, username, username))
+                #user will run pam_environment on next login, need to force user to run this?
+                #run('export %s', env_var) #run this as user?
 
 # VCS
 
