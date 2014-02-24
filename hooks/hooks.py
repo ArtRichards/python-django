@@ -362,6 +362,7 @@ def process_template(template_name, template_vars, destination):
     with open(destination, 'w') as inject_file:
         inject_file.write(str(template))
 
+
 def configure_and_install(rel):
 
     def _import_key(id):
@@ -485,26 +486,27 @@ def install():
         else:
             juju_log(MSG_ERROR, '''Failed to process repos_username and repos_password:\n
                                    cannot identify domain in URL {0}'''.format(repos_url))
-### do ssh-add here, place the ssh key within the id_rsa file
-    template_vars = { 'ssh-comment': ssh_comment,
-            'ssh-key': ssh_key }
+### do ssh- here, place the ssh key within the id_rsa_git file, then append the config
+    template_vars = { 'ssh_comment': ssh_comment,
+            'ssh_key': ssh_key }
+#    juju_log(MSG_INFO, template_vars)
     from os.path import expanduser
-    process_template('ssh-key.tmpl', template_vars, expanduser('~/.ssh/id_rsa')) ###
-    run('ssh-add')
+    process_template('ssh_key.tmpl', template_vars, expanduser('~/.ssh/%s' % ssh_comment))
+    template_vars = { 'ssh_comment': ssh_comment,
+            'ssh_vcsprovider': ssh_vcsprovider }
+    from os.path import expanduser
+    append_template('ssh_config.tmpl', template_vars, expanduser('~/.ssh/config'))
+#    run('eval `ssh-agent -c`')
+#    run('ssh-add ~/.ssh/%s' % ssh_comment)
 
 ### set env vars here (env_vars is a dictionary)
-    from os.path import expanduser
-    template_vars = { 'var1': env_var1,
-        'val1': env_val1,
-        'var2': env_var2,
-        'val2': env_val2,
-        'var3': env_var3,
-        'val3': env_val3 }
-    process_template('pam_environment.tmpl', template_vars, expanduser('~/.pam_environment')  ###
-    for env_var, env_val in env_vars.iteritems():
-        run('export %s = %s', env_var, env_val)
-
-        
+    template_vars = { env_var1 : env_val1,
+        env_var2: env_val2,
+        env_var3: env_val3 }
+    process_template('pam_environment.tmpl', template_vars, expanduser('~/.pam_environment'))
+    for k, v in template_vars.iteritems():
+        run('export %s=%s' % (k, v))
+    
     if vcs == 'hg' or vcs == 'mercurial':
         run('hg clone %s %s' % (repos_url, vcs_clone_dir))
     elif vcs == 'git' or vcs == 'git-core':
@@ -566,10 +568,12 @@ def config_changed(config_data):
 
 ### set env vars here (env_vars is a dictionary)
     from os.path import expanduser
-    template_vars = env_vars
-    process_template('pam_environment.tmpl', template_vars, expanduser('~/.pam_environment')
-    for env_var, env_val in env_vars.iteritems():
-        run('export %s = %s', env_var, env_val)
+    template_vars = { env_var1 : env_val1,
+        env_var2: env_val2,
+        env_var3: env_val3 }
+    process_template('pam_environment.tmpl', template_vars, expanduser('~/.pam_environment'))
+    for k, v in template_vars.iteritems():
+        run('export %s=%s' % (k, v))
 
     site_secret_key = config_data['site_secret_key']
     if not site_secret_key:
@@ -594,12 +598,12 @@ def upgrade():
             break
 
 ### set env vars here (env_vars is a dictionary)
-    from os.path import expanduser
-    template_vars = env_vars
-    process_template('pam_environment.tmpl', template_vars, expanduser('~/.pam_environment')
-    for env_var, env_val in env_vars.iteritems():
-        run('export %s = %s', env_var, env_val)
-
+    template_vars = { env_var1 : env_val1,
+        env_var2: env_val2,
+        env_var3: env_val3 }
+    process_template('pam_environment.tmpl', template_vars, expanduser('~/.pam_environment'))
+    for k, v in template_vars.iteritems():
+        run('export %s=%s' % (k, v))
 
     if vcs == 'hg' or vcs == 'mercurial':
         run('hg pull %s %s' % (repos_url, vcs_clone_dir))
@@ -786,6 +790,7 @@ env_var3 = config_data['env_var3']
 env_val3 = config_data['env_val3']
 ssh_comment = config_data['ssh_comment']
 ssh_key = config_data['ssh_key']
+ssh_vcsprovider = config_data['ssh_vcsprovider']
 vcs = config_data['vcs']
 repos_url = config_data['repos_url']
 repos_username = config_data['repos_username']

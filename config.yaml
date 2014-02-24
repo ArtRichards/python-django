@@ -206,15 +206,39 @@ options:
         type: int
         default: 8080
         description: "Port the application will be listenning."
-    listen_ip:
+    env_var1:
         type: string
-        default: "0.0.0.0"
-        description: "IP adresses that Gunicorn will listen on. By default we listen on all of them."
-    listen_ip:
+        default: "FOO"
+        description: "ENV_VAR1, Put the first Environment Varible you'd like to set, here."
+    env_val1:
         type: string
-        default: "0.0.0.0"
-        description: "IP adresses that Gunicorn will listen on. By default we listen on all of them."
-    listen_ip:
+        default: "BAR"
+        description: "ENV_VAL1, Put the first Environment Variable's Value here"
+    env_var2:
         type: string
-        default: "0.0.0.0"
-        description: "IP adresses that Gunicorn will listen on. By default we listen on all of them."
+        default: "FOO"
+        description: "ENV_VAR2, Put the second Environment Varible you'd like to set, here."
+    env_val2:
+        type: string
+        default: "BAR"
+        description: "ENV_VAL2, Put the second Environment Variable's Value here"
+    env_var3:
+        type: string
+        default: "FOO"
+        description: "ENV_VAR3, Put the third Environment Varible you'd like to set, here."
+    env_val3:
+        type: string
+        default: "BAR"
+        description: "ENV_VAL3, Put the third Environment Variable's Value here"
+    ssh_key:
+        type: string
+        default: "654654654654654654654654654654654654654\n654654654654654654654654654654654\n64654654654\n====="
+        description: "SSH Key, put the secret ssh key for authentication, here"
+    ssh_comment:
+        type: string
+        default: "id_rsa_git"
+        description: "SSH Comment, put the ssh key name, here"
+    ssh_vcsprovider:
+        type: string
+        default: "github.com"
+        description: "SSH VCS Provider, used for defining custom locations in .ssh/config"
